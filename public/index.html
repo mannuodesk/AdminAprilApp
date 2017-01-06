@@ -1,0 +1,191 @@
+<!--<head>
+... // your other code
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script>
+var socket = io().connect('http://aprilappserver.azurewebsites.net');
+
+socket.on('connect', function(){
+    socket.emit('adduser', prompt("What's your name: "));
+});
+
+socket.on('disconnect', function(){
+    console.log('Dis');
+});
+
+socket.on('updatechat', function (username, data) {
+    $('#conversation').append('<b>'+ username + ':</b> ' + data + '<br>');
+});
+
+
+socket.on('updaterooms', function (rooms, current_room) {
+    $('#rooms').empty();
+    $.each(rooms, function(key, value) {
+        if(value == current_room){
+            $('#rooms').append('<div>' + value + '</div>');
+        }
+        else {
+            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+        }
+    });
+});
+
+function switchRoom(room){
+    socket.emit('switchRoom', room);
+}
+
+$(function(){
+    $('#datasend').click( function() {
+        /*var message = $('#data').val();
+        $('#data').val('');
+        $('#conversation').append('<b> Ali :</b> ' + message + '<br>');
+        var data = {'messageType':'text', 'messageText':message, 'messageData':'', '_conversationId':'585d03de1387c51fb4639643', '_messageFromUserId':'5858525caafefb15d4332e4d'};
+        socket.emit('sendchat', data);*/
+        var message = $('#data').val();
+        
+        //$('#conversation').append('<b> Ali :</b> ' + message + '<br>');
+        $('#data').val('');
+        socket.emit('sendchat', message);
+    });
+
+    $('#data').keypress(function(e) {
+        if(e.which == 13) {
+            $(this).blur();
+            $('#datasend').focus().click();
+        }
+    });
+
+    $('#roombutton').click(function(){
+        var name = $('#roomname').val();
+        $('#roomname').val('');
+        socket.emit('create', name)
+    });
+});
+
+</script>
+</head>
+<body>
+    <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+        <b>ROOMS</b>
+        <div id="rooms"></div>
+    </div>
+
+    <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+        <div id="conversation"></div>
+        <input id="data" style="width:200px;" />
+        <input type="button" id="datasend" value="send" />
+    </div>
+
+   <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+       <div id="room creation"></div>
+       <input id="roomname" style="width:200px;" />
+        <input type="button" id="roombutton" value="create room" />
+   </div>
+   ... // the rest of your page
+</body>-->
+
+<head>
+... // your other code
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script>
+var socket = io().connect('http://aprilappserver.azurewebsites.net');
+
+var roomId = "";
+var roomName = "";
+var UserId = "";
+
+socket.on('connect', function(){
+    socket.emit('create', '58637560c464b31d2cedb55b');
+    socket.emit('adduser', {'id':'58637560c464b31d2cedb55b', 'name':'ALI Sajjad Rizvi','_roomId':'58637560c464b31d2cedb55b', 'roomName':'Default Room'});
+});
+
+socket.on('updatechat', function (username, data) {
+    console.log(data);
+    $('#conversation').append('<b>'+ username + ':</b> ' + data + '<br>');
+});
+socket.on('ping', function(data){
+    console.log('ping');
+      socket.emit('mnb');
+    });
+socket.on('disconnect', function(){
+    console.log('Dis');
+});
+
+socket.on('updaterooms', function (rooms, current_room) {
+    console.log(rooms);
+    console.log(current_room);
+    $('#rooms').empty();
+    $.each(rooms, function(key, value) {
+        if(value == current_room){
+            roomId = value._id;
+            roomName = value;
+            $('#rooms').append('<div>' + value + '</div>');
+        }
+        else {
+            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+        }
+    });
+});
+
+socket.on('typingstart', function (name) {
+    console.log(name + " is typing");
+});
+
+socket.on('typingend', function (name) {
+    console.log(name + " is not typing");
+});
+
+function switchRoom(room){
+    socket.emit('switchRoom', room);
+}
+
+$(function(){
+    $('#datasend').click( function() {
+        /*var message = $('#data').val();
+        $('#data').val('');
+        $('#conversation').append('<b> Ali :</b> ' + message + '<br>');
+        var data = {'messageType':'text', 'messageText':message, 'messageData':'', '_conversationId':'585d03de1387c51fb4639643', '_messageFromUserId':'5858525caafefb15d4332e4d'};
+        socket.emit('sendchat', data);*/
+        var message = $('#data').val();
+        
+        $('#conversation').append('<b> Ali :</b> ' + message + '<br>');
+        $('#data').val('');
+        socket.emit('sendchat', message);
+    });
+
+    $('#data').keypress(function(e) {
+        if(e.which == 13) {
+            $(this).blur();
+            $('#datasend').focus().click();
+        }
+    });
+
+    $('#roombutton').click(function(){
+        var name = $('#roomname').val();
+        $('#roomname').val('');
+        socket.emit('create', name)
+    });
+});
+
+</script>
+</head>
+<body>
+    <div style="float:left;width:15%;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+        <b>ROOMS</b>
+        <div id="rooms"></div>
+    </div>
+
+    <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+        <div id="conversation"></div>
+        <input id="data" style="width:200px;" />
+        <input type="button" id="datasend" value="send" />
+    </div>
+
+   <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+       <div id="room creation"></div>
+       <input id="roomname" style="width:200px;" />
+        <input type="button" id="roombutton" value="create room" />
+   </div>
+   ... // the rest of your page
+</body>
